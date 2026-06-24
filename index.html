@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Battle Arena: Ultimate 2 Player Shooter</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@400;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div id="game-wrapper">
+
+    <!-- MAIN MENU -->
+    <div id="main-menu" class="screen active">
+      <div class="menu-bg">
+        <div class="particle" style="--x:10%;--y:20%;--s:6px;--d:3s"></div>
+        <div class="particle" style="--x:80%;--y:60%;--s:4px;--d:5s"></div>
+        <div class="particle" style="--x:50%;--y:80%;--s:8px;--d:4s"></div>
+        <div class="particle" style="--x:25%;--y:45%;--s:5px;--d:6s"></div>
+        <div class="particle" style="--x:70%;--y:15%;--s:7px;--d:2s"></div>
+        <div class="particle" style="--x:90%;--y:75%;--s:3px;--d:7s"></div>
+      </div>
+      <div class="menu-content">
+        <div class="logo-area">
+          <div class="logo-sub">⚔️ ULTIMATE</div>
+          <h1 class="logo-title">BATTLE<br/><span>ARENA</span></h1>
+          <div class="logo-tagline">2 PLAYER SHOOTER</div>
+        </div>
+        <div class="menu-buttons">
+          <button class="btn btn-primary pulse" onclick="showScreen('mode-select')">🎮 PLAY NOW</button>
+          <button class="btn btn-secondary" onclick="showScreen('shop-screen')">🛒 SHOP</button>
+          <button class="btn btn-secondary" onclick="showScreen('inventory-screen')">🎒 INVENTORY</button>
+          <button class="btn btn-secondary" onclick="showScreen('leaderboard-screen')">🏆 LEADERBOARD</button>
+          <button class="btn btn-outline" onclick="showScreen('settings-screen')">⚙️ SETTINGS</button>
+        </div>
+        <div class="menu-stats">
+          <div class="stat-pill">💰 <span id="menu-coins">0</span></div>
+          <div class="stat-pill">⭐ LV <span id="menu-level">1</span></div>
+          <div class="stat-pill">💀 <span id="menu-kills">0</span> Kills</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MODE SELECT -->
+    <div id="mode-select" class="screen">
+      <div class="screen-header">
+        <button class="btn-back" onclick="showScreen('main-menu')">← BACK</button>
+        <h2>SELECT MODE</h2>
+      </div>
+      <div class="mode-grid">
+        <div class="mode-card" onclick="startGame('single')">
+          <div class="mode-icon">🤖</div>
+          <h3>SINGLE PLAYER</h3>
+          <p>Fight against intelligent AI bots</p>
+          <div class="mode-tag">vs AI</div>
+        </div>
+        <div class="mode-card" onclick="startGame('two-player')">
+          <div class="mode-icon">👥</div>
+          <h3>2 PLAYER</h3>
+          <p>Local multiplayer on same keyboard</p>
+          <div class="mode-tag">HOT SEAT</div>
+        </div>
+        <div class="mode-card" onclick="startGame('survival')">
+          <div class="mode-icon">🌊</div>
+          <h3>SURVIVAL</h3>
+          <p>Survive endless waves of enemies</p>
+          <div class="mode-tag">ENDLESS</div>
+        </div>
+        <div class="mode-card" onclick="startGame('team')">
+          <div class="mode-icon">🛡️</div>
+          <h3>TEAM MODE</h3>
+          <p>2 Humans vs AI bot army</p>
+          <div class="mode-tag">CO-OP</div>
+        </div>
+      </div>
+      <div class="map-select-section">
+        <h3>SELECT MAP</h3>
+        <div class="map-grid" id="map-grid"></div>
+      </div>
+    </div>
+
+    <!-- GAME SCREEN -->
+    <div id="game-screen" class="screen">
+      <div id="game-hud">
+        <!-- P1 HUD -->
+        <div class="player-hud p1-hud">
+          <div class="hud-name">P1 · <span id="p1-char-name">Soldier</span></div>
+          <div class="health-bar-wrap">
+            <div class="health-bar" id="p1-health-bar"></div>
+          </div>
+          <div class="hud-stats">
+            <span class="hud-weapon" id="p1-weapon">🔫 Pistol</span>
+            <span class="hud-ammo" id="p1-ammo">12/12</span>
+            <span class="hud-bomb" id="p1-bombs">💣x3</span>
+          </div>
+          <div class="hud-score">Kills: <span id="p1-kills">0</span></div>
+        </div>
+
+        <!-- CENTER HUD -->
+        <div class="center-hud">
+          <div class="round-info">Round <span id="round-num">1</span></div>
+          <div class="timer" id="game-timer">3:00</div>
+          <div class="coin-display">💰 <span id="game-coins">0</span></div>
+        </div>
+
+        <!-- P2 HUD -->
+        <div class="player-hud p2-hud">
+          <div class="hud-name">P2 · <span id="p2-char-name">Bot</span></div>
+          <div class="health-bar-wrap">
+            <div class="health-bar" id="p2-health-bar"></div>
+          </div>
+          <div class="hud-stats">
+            <span class="hud-weapon" id="p2-weapon">🔫 Pistol</span>
+            <span class="hud-ammo" id="p2-ammo">12/12</span>
+            <span class="hud-bomb" id="p2-bombs">💣x3</span>
+          </div>
+          <div class="hud-score">Kills: <span id="p2-kills">0</span></div>
+        </div>
+      </div>
+
+      <canvas id="game-canvas"></canvas>
+
+      <div id="pause-overlay" class="hidden">
+        <div class="pause-panel">
+          <h2>⏸ PAUSED</h2>
+          <button class="btn btn-primary" onclick="resumeGame()">▶ RESUME</button>
+          <button class="btn btn-secondary" onclick="restartGame()">🔄 RESTART</button>
+          <button class="btn btn-outline" onclick="quitToMenu()">🏠 MAIN MENU</button>
+        </div>
+      </div>
+
+      <div id="game-over-overlay" class="hidden">
+        <div class="game-over-panel">
+          <h1 id="winner-text">PLAYER 1 WINS!</h1>
+          <div class="result-stats" id="result-stats"></div>
+          <div class="result-rewards" id="result-rewards"></div>
+          <div class="result-btns">
+            <button class="btn btn-primary" onclick="restartGame()">🔄 PLAY AGAIN</button>
+            <button class="btn btn-outline" onclick="quitToMenu()">🏠 MENU</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SHOP SCREEN -->
+    <div id="shop-screen" class="screen">
+      <div class="screen-header">
+        <button class="btn-back" onclick="showScreen('main-menu')">← BACK</button>
+        <h2>🛒 SHOP</h2>
+        <div class="header-coins">💰 <span id="shop-coins">0</span></div>
+      </div>
+      <div class="shop-tabs">
+        <button class="tab-btn active" onclick="switchTab('weapons-tab')">WEAPONS</button>
+        <button class="tab-btn" onclick="switchTab('chars-tab')">CHARACTERS</button>
+        <button class="tab-btn" onclick="switchTab('maps-tab')">MAPS</button>
+      </div>
+      <div id="weapons-tab" class="tab-content active"></div>
+      <div id="chars-tab" class="tab-content"></div>
+      <div id="maps-tab" class="tab-content"></div>
+    </div>
+
+    <!-- INVENTORY SCREEN -->
+    <div id="inventory-screen" class="screen">
+      <div class="screen-header">
+        <button class="btn-back" onclick="showScreen('main-menu')">← BACK</button>
+        <h2>🎒 INVENTORY</h2>
+      </div>
+      <div class="inv-sections">
+        <div class="inv-section">
+          <h3>YOUR WEAPONS</h3>
+          <div class="inv-grid" id="inv-weapons"></div>
+        </div>
+        <div class="inv-section">
+          <h3>CHARACTERS</h3>
+          <div class="inv-grid" id="inv-chars"></div>
+        </div>
+        <div class="inv-section">
+          <h3>ACHIEVEMENTS</h3>
+          <div class="achievement-list" id="achievements-list"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- LEADERBOARD SCREEN -->
+    <div id="leaderboard-screen" class="screen">
+      <div class="screen-header">
+        <button class="btn-back" onclick="showScreen('main-menu')">← BACK</button>
+        <h2>🏆 LEADERBOARD</h2>
+      </div>
+      <div class="leaderboard-content">
+        <div class="lb-tabs">
+          <button class="tab-btn active" onclick="switchLbTab('kills')">KILLS</button>
+          <button class="tab-btn" onclick="switchLbTab('wins')">WINS</button>
+          <button class="tab-btn" onclick="switchLbTab('level')">LEVEL</button>
+        </div>
+        <div id="lb-table"></div>
+        <div class="your-stats-box">
+          <h3>YOUR STATS</h3>
+          <div id="your-stats-grid" class="stat-grid"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SETTINGS SCREEN -->
+    <div id="settings-screen" class="screen">
+      <div class="screen-header">
+        <button class="btn-back" onclick="showScreen('main-menu')">← BACK</button>
+        <h2>⚙️ SETTINGS</h2>
+      </div>
+      <div class="settings-list">
+        <div class="setting-row">
+          <label>🔊 Master Volume</label>
+          <input type="range" id="vol-master" min="0" max="100" value="70" oninput="updateVolume('master',this.value)"/>
+          <span id="vol-master-val">70%</span>
+        </div>
+        <div class="setting-row">
+          <label>🎵 Music Volume</label>
+          <input type="range" id="vol-music" min="0" max="100" value="50" oninput="updateVolume('music',this.value)"/>
+          <span id="vol-music-val">50%</span>
+        </div>
+        <div class="setting-row">
+          <label>💥 SFX Volume</label>
+          <input type="range" id="vol-sfx" min="0" max="100" value="80" oninput="updateVolume('sfx',this.value)"/>
+          <span id="vol-sfx-val">80%</span>
+        </div>
+        <div class="setting-row">
+          <label>📳 Screen Shake</label>
+          <div class="toggle" id="shake-toggle" onclick="toggleSetting('screenShake')" data-on="true">ON</div>
+        </div>
+        <div class="setting-row">
+          <label>✨ Particles</label>
+          <div class="toggle" id="particles-toggle" onclick="toggleSetting('particles')" data-on="true">ON</div>
+        </div>
+        <div class="setting-row">
+          <label>🤖 Bot Difficulty</label>
+          <select id="bot-difficulty" onchange="updateSetting('botDifficulty',this.value)">
+            <option value="easy">Easy</option>
+            <option value="medium" selected>Medium</option>
+            <option value="hard">Hard</option>
+            <option value="expert">Expert</option>
+          </select>
+        </div>
+        <div class="setting-row">
+          <label>🗺️ Map Theme</label>
+          <select id="map-theme" onchange="updateSetting('mapTheme',this.value)">
+            <option value="arena">Training Camp</option>
+            <option value="desert">Desert Arena</option>
+            <option value="jungle">Jungle Warzone</option>
+          </select>
+        </div>
+        <div class="setting-row">
+          <button class="btn-danger" onclick="resetProgress()">⚠️ RESET PROGRESS</button>
+        </div>
+      </div>
+      <div class="controls-ref">
+        <h3>CONTROLS REFERENCE</h3>
+        <div class="controls-grid">
+          <div class="control-col">
+            <h4>PLAYER 1</h4>
+            <div class="key-row"><kbd>W A S D</kbd> Move</div>
+            <div class="key-row"><kbd>T</kbd> Shoot</div>
+            <div class="key-row"><kbd>Y</kbd> Throw Bomb</div>
+          </div>
+          <div class="control-col">
+            <h4>PLAYER 2</h4>
+            <div class="key-row"><kbd>↑ ↓ ← →</kbd> Move</div>
+            <div class="key-row"><kbd>[</kbd> Shoot</div>
+            <div class="key-row"><kbd>]</kbd> Throw Bomb</div>
+          </div>
+          <div class="control-col">
+            <h4>GLOBAL</h4>
+            <div class="key-row"><kbd>ESC</kbd> Pause</div>
+            <div class="key-row"><kbd>F</kbd> Fullscreen</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DAILY REWARD POPUP -->
+    <div id="daily-reward-popup" class="popup hidden">
+      <div class="popup-panel">
+        <h2>🎁 DAILY REWARD!</h2>
+        <div class="reward-amount" id="daily-reward-amount">+200 Coins</div>
+        <p>Come back tomorrow for more!</p>
+        <button class="btn btn-primary" onclick="claimDailyReward()">CLAIM!</button>
+      </div>
+    </div>
+
+    <!-- NOTIFICATION -->
+    <div id="notification" class="notification hidden"></div>
+
+  </div>
+
+  <!-- ── Scripts: load order matters ── -->
+  <!-- 1. Save (global saveData) -->
+  <script src="saveSystem.js"></script>
+  <!-- 2. Audio -->
+  <script src="audio.js"></script>
+  <!-- 3. Game data definitions -->
+  <script src="weapons.js"></script>
+  <script src="bombs.js"></script>
+  <script src="maps.js"></script>
+  <script src="levels.js"></script>
+  <!-- 4. Entity classes (Player needs WeaponInstance from weapons.js) -->
+  <script src="player.js"></script>
+  <!-- 5. Bot (extends Player) -->
+  <script src="bot.js"></script>
+  <!-- 6. UI helpers (showScreen, notifications, settings) -->
+  <script src="ui.js"></script>
+  <!-- 7. Feature screens -->
+  <script src="leaderboard.js"></script>
+  <script src="shop.js"></script>
+  <script src="inventory.js"></script>
+  <!-- 8. Game engine -->
+  <script src="game.js"></script>
+  <!-- 9. Boot (keyboard + init) -->
+  <script src="script.js"></script>
+</body>
+</html>
